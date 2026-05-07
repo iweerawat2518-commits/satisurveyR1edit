@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบประเมินความพึงพอใจ รพ.สต.บึงเนียม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* สไตล์ปุ่ม Radio แบบกำหนดเอง */
+        .radio-btn-group input[type="radio"]:checked + div {
+            background-color: #2563eb; color: white; border-color: #2563eb; font-weight: 500;
+        }
+        .radio-btn-group input[type="radio"].missing + div {
+            border-color: #ef4444; border-width: 2px;
+        }
+        
+        .scale-group input[type="radio"]:checked[value="5"] + div { background-color: #166534; color: white; border-color: #166534; }
+        .scale-group input[type="radio"]:checked[value="4"] + div { background-color: #22c55e; color: white; border-color: #22c55e; }
+        .scale-group input[type="radio"]:checked[value="3"] + div { background-color: #eab308; color: white; border-color: #eab308; }
+        .scale-group input[type="radio"]:checked[value="2"] + div { background-color: #f97316; color: white; border-color: #f97316; }
+        .scale-group input[type="radio"]:checked[value="1"] + div { background-color: #ef4444; color: white; border-color: #ef4444; }
+
+        /* Loader */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-hospital-user text-2xl mr-3"></i>
+                    <span class="font-bold text-lg hidden sm:block">รพ.สต.บึงเนียม ขอนแก่น</span>
+                    <span class="font-bold text-lg sm:hidden">รพ.สต.บึงเนียม</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="switchView('form')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 nav-btn" id="nav-form">แบบประเมิน</button>
+                    <button onclick="switchView('dashboard')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 nav-btn" id="nav-dashboard">Dashboard</button>
+                    <button onclick="openLoginModal()" class="px-3 py-2 bg-yellow-500 text-blue-900 rounded-md text-sm font-bold hover:bg-yellow-400 shadow-sm">
+                        <i class="fa-solid fa-lock mr-1"></i> Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 mt-4" id="main-container">
+        
+        <!-- View: Form -->
+        <div id="view-form" class="space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 border-t-4 border-blue-600">
+                <h1 class="text-2xl sm:text-3xl font-bold text-center text-blue-800 mb-4">แบบสอบถามงานวิจัย</h1>
+                <h2 class="text-lg sm:text-xl font-semibold text-center text-gray-700 mb-6">
+                    สภาพปัญหาและความต้องการในการพัฒนาระบบประเมินความพึงพอใจด้วยเทคโนโลยีดิจิทัลและปัญญาประดิษฐ์<br>
+                    <span class="text-blue-600 text-base">โรงพยาบาลส่งเสริมสุขภาพตำบลบึงเนียม อำเภอเมือง จังหวัดขอนแก่น</span>
+                </h2>
+                <div class="bg-blue-50 p-4 rounded-lg text-sm text-gray-600 border border-blue-100">
+                    <p><strong>คำชี้แจง:</strong> ข้อมูลที่ได้จะนำไปใช้เป็นแนวทางในการพัฒนาระบบให้ตอบสนองต่อความต้องการอย่างแท้จริง ขอความกรุณาตอบตามความเป็นจริง ข้อมูลของท่านจะถูกเก็บเป็นความลับเพื่อการวิจัยเท่านั้น</p>
+                </div>
+            </div>
+
+            <form id="researchForm" class="space-y-6">
+                <!-- Part 1: General Info -->
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-100"><span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm mr-2">ส่วนที่ 1</span> ข้อมูลทั่วไปของผู้ตอบแบบสอบถาม</h3>
+                    <div class="space-y-6" id="part1-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Part 2: Problems -->
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-red-100"><span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm mr-2">ส่วนที่ 2</span> สภาพปัญหาของระบบประเมินความพึงพอใจในปัจจุบัน</h3>
+                    <p class="text-sm text-gray-500 mb-4">เกณฑ์: 5 = มีปัญหามากที่สุด, 4 = มาก, 3 = ปานกลาง, 2 = น้อย, 1 = น้อยที่สุด</p>
+                    <div id="part2-container" class="space-y-8">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Part 3: Needs -->
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-green-100"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm mr-2">ส่วนที่ 3</span> ความต้องการในการพัฒนาระบบประเมินด้วยเทคโนโลยีดิจิทัลและ AI</h3>
+                    <p class="text-sm text-gray-500 mb-4">เกณฑ์: 5 = ต้องการมากที่สุด, 4 = มาก, 3 = ปานกลาง, 2 = น้อย, 1 = น้อยที่สุด</p>
+                    <div id="part3-container" class="space-y-8">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Part 4: Open Ended -->
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-100"><span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm mr-2">ส่วนที่ 4</span> ความคิดเห็นและข้อเสนอแนะเพิ่มเติม</h3>
+                    <div class="space-y-6" id="part4-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center pb-10">
+                    <button type="submit" id="btn-submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 text-lg w-full sm:w-auto">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> บันทึกข้อมูล
+                    </button>
+                    <div id="submit-loading" class="hidden justify-center items-center mt-4 text-blue-600">
+                        <div class="loader mr-3"></div> กำลังบันทึกข้อมูล...
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- View: Dashboard -->
+        <div id="view-dashboard" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-yellow-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-chart-pie mr-2 text-yellow-500"></i> สรุปผลการวิเคราะห์ข้อมูล</h2>
+                    <button onclick="refreshDashboard()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm"><i class="fa-solid fa-rotate-right"></i> รีเฟรช</button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
+                        <p class="text-blue-600 text-sm font-semibold">จำนวนผู้ตอบทั้งหมด</p>
+                        <p class="text-3xl font-bold text-blue-800" id="dash-total">0</p>
+                        <p class="text-xs text-gray-500 mt-1">คน</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-4 text-center border border-red-100">
+                        <p class="text-red-600 text-sm font-semibold">ภาพรวมสภาพปัญหา (เฉลี่ย)</p>
+                        <p class="text-3xl font-bold text-red-800" id="dash-prob-avg">0.00</p>
+                        <p class="text-xs text-gray-500 mt-1" id="dash-prob-level">-</p>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4 text-center border border-green-100">
+                        <p class="text-green-600 text-sm font-semibold">ภาพรวมความต้องการ (เฉลี่ย)</p>
+                        <p class="text-3xl font-bold text-green-800" id="dash-need-avg">0.00</p>
+                        <p class="text-xs text-gray-500 mt-1" id="dash-need-level">-</p>
+                    </div>
+                </div>
+
+                <!-- Tabs for Dashboard -->
+                <div class="border-b border-gray-200 mb-4">
+                    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                        <button onclick="switchDashTab('dash-p1')" id="tab-dash-p1" class="border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">ข้อมูลทั่วไป</button>
+                        <button onclick="switchDashTab('dash-p2')" id="tab-dash-p2" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">สภาพปัญหา</button>
+                        <button onclick="switchDashTab('dash-p3')" id="tab-dash-p3" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">ความต้องการ</button>
+                    </nav>
+                </div>
+
+                <div id="dash-p1" class="dash-content">
+                    <div id="chart-demographics" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Demographics populated by JS -->
+                    </div>
+                </div>
+
+                <div id="dash-p2" class="dash-content hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-medium text-gray-500">ข้อ</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 w-24">Mean</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 w-24">S.D.</th>
+                                    <th class="px-3 py-2 text-center font-medium text-gray-500 w-32">ระดับ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-dash-prob" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="dash-p3" class="dash-content hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-medium text-gray-500">ข้อ</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 w-24">Mean</th>
+                                    <th class="px-3 py-2 text-right font-medium text-gray-500 w-24">S.D.</th>
+                                    <th class="px-3 py-2 text-center font-medium text-gray-500 w-32">ระดับ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-dash-need" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View: Admin Area -->
+        <div id="view-admin" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-gray-800">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-users-gear mr-2 text-gray-600"></i> รายละเอียดผู้เข้าร่วมการวิจัย</h2>
+                    <button onclick="logoutAdmin()" class="text-red-500 hover:text-red-700 text-sm font-semibold"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</button>
+                </div>
+                
+                <div class="mb-4 text-sm text-gray-600">
+                    <i class="fa-solid fa-circle-info text-blue-500"></i> คลิกที่รายชื่อเพื่อตรวจสอบและแก้ไขข้อมูล (ช่องสีแดงคือค่าว่าง/Missing)
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 shadow-sm rounded-lg border">
+                        <thead class="bg-gray-800 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ลำดับ/ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">สถานะ</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">ข้อมูลส่วนที่ 1</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">ข้อมูลส่วน 2-3</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
+                    <i class="fa-solid fa-shield-halved text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">ผู้ดูแลระบบ</h3>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="login-user" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" placeholder="admin">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-pass" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" placeholder="1234">
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden text-center font-medium">รหัสผ่านไม่ถูกต้อง!</div>
+                <div class="flex space-x-3 mt-6">
+                    <button onclick="closeLoginModal()" class="w-1/2 bg-gray-200 text-gray-800 font-semibold py-2 rounded-md hover:bg-gray-300">ยกเลิก</button>
+                    <button onclick="checkLogin()" class="w-1/2 bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700">เข้าสู่ระบบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/View Modal (Admin) -->
+    <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden overflow-y-auto">
+        <div class="bg-white w-full max-w-4xl min-h-screen sm:min-h-0 sm:rounded-xl shadow-2xl flex flex-col sm:my-8">
+            <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50 sticky top-0 z-10">
+                <h3 class="text-lg font-bold text-gray-800">แก้ไขข้อมูล (ID: <span id="edit-id-display"></span>)</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto" style="max-height: 70vh;">
+                <!-- Reusing the form structure for editing -->
+                <form id="editForm" class="space-y-6">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="ID" id="edit-id-input">
+                    <div id="edit-form-container"></div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t bg-gray-50 flex justify-end space-x-3 sticky bottom-0 z-10">
+                <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded font-medium hover:bg-gray-300">ปิด</button>
+                <button onclick="submitEditForm()" id="btn-edit-submit" class="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700">
+                    <i class="fa-solid fa-save mr-1"></i> บันทึกการแก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal (Alerts) -->
+    <div id="msg-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full text-center shadow-xl">
+            <div id="msg-icon" class="text-4xl mb-4"></div>
+            <h3 id="msg-title" class="text-lg font-bold mb-2"></h3>
+            <p id="msg-text" class="text-gray-600 mb-6"></p>
+            <button onclick="closeMsgModal()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ---------------------------------------------------- -->
+    <script>
+        // === การตั้งค่าเชื่อมต่อ Google Apps Script (นำ URL จาก Deploy มาใส่ตรงนี้) ===
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4TqIMJv3L3F4HgOnZMhMFioYOunvC7qMQw1GTmtqINSFOEdfr_bixjotQgxVyizB1/exec'; // จำเป็นต้องระบุ URL นี้เพื่อให้บันทึกและดึงข้อมูลจาก GS ได้จริง
+        
+        // สถานะและข้อมูล
+        let localData = []; 
+        let currentAdminLoggedIn = false;
+
+        // ข้อมูลโครงสร้างแบบสอบถาม
+        const questionnaireConfig = {
+            part1: [
+                { id: 'status', label: '1. สถานะของท่าน', options: ['ผู้มารับบริการ รพ.สต.บึงเนียม', 'อาสาสมัครสาธารณสุขประจำหมู่บ้าน (อสม.)', 'เจ้าหน้าที่สาธารณสุข รพ.สต.บึงเนียม'] },
+                { id: 'gender', label: '2. เพศ', options: ['ชาย', 'หญิง', 'ไม่ระบุ'] },
+                { id: 'age', label: '3. อายุ', options: ['น้อยกว่า 20 ปี', '20 – 29 ปี', '30 – 39 ปี', '40 – 49 ปี', '50 – 59 ปี', '60 ปีขึ้นไป'] },
+                { id: 'education', label: '4. ระดับการศึกษาสูงสุด', options: ['ประถมศึกษาหรือต่ำกว่า', 'มัธยมศึกษาตอนต้น / ตอนปลาย / ปวช.', 'อนุปริญญา / ปวส.', 'ปริญญาตรี', 'สูงกว่าปริญญาตรี'] },
+                { id: 'frequency', label: '5. ความถี่ในการมารับบริการ', options: ['ครั้งแรก', '1 – 2 ครั้งต่อเดือน', '3 – 4 ครั้งต่อเดือน', 'มากกว่า 4 ครั้งต่อเดือน'] },
+                { id: 'experience_digital', label: '6. ท่านเคยมีประสบการณ์ใช้งานระบบประเมินความพึงพอใจในรูปแบบดิจิทัลหรือไม่', options: ['เคย', 'ไม่เคย'] },
+                { id: 'smartphone_internet', label: '7. ท่านมีสมาร์ตโฟนและสามารถเข้าถึงอินเทอร์เน็ตได้หรือไม่', options: ['มี และใช้งานได้สะดวก', 'มี แต่ใช้งานได้บ้างเป็นบางครั้ง', 'ไม่มีสมาร์ตโฟน / ไม่มีอินเทอร์เน็ต'] }
+            ],
+            part2: {
+                sections: [
+                    { title: 'ด้านที่ 1: ช่องทางและความสะดวกในการประเมิน', start: 1, end: 5, texts: ['ระบบประเมินความพึงพอใจในปัจจุบัน (กระดาษ) ไม่สะดวกในการกรอกข้อมูล', 'ไม่มีช่องทางดิจิทัลสำหรับการประเมินความพึงพอใจผ่านสมาร์ตโฟน', 'ผู้มารับบริการต้องรอกรอกแบบประเมินในสถานที่ ทำให้เสียเวลา', 'ไม่สามารถประเมินความพึงพอใจได้หลังออกจาก รพ.สต. แล้ว', 'ผู้มารับบริการที่มีข้อจำกัดด้านการอ่านเขียนไม่สามารถใช้ระบบได้สะดวก'] },
+                    { title: 'ด้านที่ 2: ความครบถ้วนและคุณภาพของข้อมูล', start: 6, end: 10, texts: ['อัตราการตอบแบบประเมินความพึงพอใจของผู้มารับบริการอยู่ในระดับต่ำ', 'ข้อมูลความพึงพอใจที่จัดเก็บได้ไม่ครบถ้วนตามที่กำหนด', 'ผู้มารับบริการไม่กล้าแสดงความคิดเห็นที่แท้จริงในแบบประเมินกระดาษ', 'ข้อมูลความคิดเห็นเชิงคุณภาพ (ข้อความ) ที่รวบรวมได้มีปริมาณน้อย', 'ข้อมูลความพึงพอใจไม่สะท้อนปัญหาที่แท้จริงของผู้มารับบริการ'] },
+                    { title: 'ด้านที่ 3: การประมวลผลและการรายงานผล', start: 11, end: 15, texts: ['การรวบรวมและสรุปผลแบบประเมินใช้เวลานานและต้องใช้แรงงานมาก', 'ไม่มีระบบรายงานผลแบบ Real-time ให้ผู้บริหารและเจ้าหน้าที่ใช้ตัดสินใจ', 'ข้อมูลความพึงพอใจไม่ถูกนำไปใช้ประโยชน์ในการพัฒนาคุณภาพบริการอย่างจริงจัง', 'ไม่มีการวิเคราะห์แนวโน้มความพึงพอใจในแต่ละช่วงเวลา', 'ไม่มีระบบแจ้งเตือนอัตโนมัติเมื่อพบปัญหาคุณภาพบริการเร่งด่วน'] },
+                    { title: 'ด้านที่ 4: การนำเทคโนโลยีมาใช้ในการประเมินความพึงพอใจ', start: 16, end: 20, texts: ['รพ.สต.ยังขาดระบบรับข้อมูลความพึงพอใจผ่านช่องทางดิจิทัล เช่น LINE หรือเว็บแอปพลิเคชัน', 'ไม่มีระบบวิเคราะห์ความรู้สึกและความคิดเห็นของผู้มารับบริการด้วยปัญญาประดิษฐ์', 'ไม่มีแดชบอร์ด (Dashboard) แสดงผลข้อมูลความพึงพอใจแบบ Real-time', 'เจ้าหน้าที่สาธารณสุขขาดเครื่องมือดิจิทัลในการติดตามและประเมินคุณภาพบริการ', 'ไม่มีระบบ AI Chatbot สำหรับรับเรื่องร้องเรียนหรือข้อเสนอแนะของผู้มารับบริการ'] }
+                ]
+            },
+            part3: {
+                sections: [
+                    { title: 'ด้านที่ 1: ช่องทางการประเมินความพึงพอใจแบบดิจิทัล', start: 1, end: 5, texts: ['ต้องการระบบประเมินความพึงพอใจผ่านสมาร์ตโฟนที่ใช้งานง่าย', 'ต้องการประเมินความพึงพอใจผ่าน LINE Official Account ของ รพ.สต.', 'ต้องการสแกน QR Code เพื่อเข้าสู่ระบบประเมินได้ทันทีหลังรับบริการ', 'ต้องการให้ระบบรองรับการใช้งานทั้งบนคอมพิวเตอร์และสมาร์ตโฟน', 'ต้องการให้ระบบมีเสียงอ่านคำถาม สำหรับผู้ที่มีข้อจำกัดด้านการอ่าน'] },
+                    { title: 'ด้านที่ 2: การประมวลผลด้วยปัญญาประดิษฐ์ (AI)', start: 6, end: 10, texts: ['ต้องการให้ระบบวิเคราะห์ความรู้สึกและความคิดเห็นของผู้มารับบริการด้วย AI อัตโนมัติ', 'ต้องการให้ AI จำแนกประเด็นปัญหาจากข้อความความคิดเห็นของผู้มารับบริการได้', 'ต้องการให้ระบบสรุปผลการประเมินความพึงพอใจรายวัน รายเดือน และรายปีอัตโนมัติ', 'ต้องการให้ AI วิเคราะห์แนวโน้มและคาดการณ์ระดับความพึงพอใจของผู้มารับบริการ', 'ต้องการให้ระบบแนะนำแนวทางการพัฒนาคุณภาพบริการโดย AI อัตโนมัติ'] },
+                    { title: 'ด้านที่ 3: การรายงานผลและแดชบอร์ด', start: 11, end: 15, texts: ['ต้องการแดชบอร์ดแสดงผลข้อมูลความพึงพอใจแบบ Real-time', 'ต้องการกราฟและภาพแสดงผลที่เข้าใจง่ายสำหรับผู้บริหารและเจ้าหน้าที่', 'ต้องการให้ระบบสามารถส่งออกรายงานในรูปแบบ PDF หรือ Excel ได้', 'ต้องการให้ระบบแยกรายงานผลตามประเภทบริการ เช่น OPD คลินิก NCD คลินิกฝากครรภ์', 'ต้องการให้แดชบอร์ดสามารถเข้าถึงได้ผ่านสมาร์ตโฟนของเจ้าหน้าที่'] },
+                    { title: 'ด้านที่ 4: ระบบแจ้งเตือนและการตอบสนองอัตโนมัติ', start: 16, end: 20, texts: ['ต้องการให้ระบบแจ้งเตือนทางไลน์เมื่อพบผู้มารับบริการที่ไม่พึงพอใจในระดับต่ำ', 'ต้องการให้ระบบตอบรับความคิดเห็นของผู้มารับบริการอัตโนมัติผ่าน AI Chatbot', 'ต้องการให้ระบบแจ้งเตือนเจ้าหน้าที่เมื่อมีเรื่องร้องเรียนหรือข้อเสนอแนะเร่งด่วน', 'ต้องการให้ระบบส่งผลสรุปประจำวันให้ผู้บริหารอัตโนมัติผ่าน LINE', 'ต้องการให้ระบบติดตามผลการดำเนินการแก้ไขปัญหาตามข้อร้องเรียนของผู้มารับบริการ'] },
+                    { title: 'ด้านที่ 5: ความปลอดภัยของข้อมูลและความง่ายในการใช้งาน', start: 21, end: 25, texts: ['ต้องการให้ระบบไม่จำเป็นต้องลงทะเบียนหรือสร้างบัญชีผู้ใช้ สามารถประเมินได้ทันที', 'ต้องการให้ระบบรักษาความลับของข้อมูลผู้มารับบริการอย่างเคร่งครัด', 'ต้องการให้ระบบใช้งานได้ง่าย ไม่ซับซ้อน เหมาะสำหรับผู้สูงอายุ', 'ต้องการให้ระบบใช้งานได้โดยไม่ต้องใช้อินเทอร์เน็ตความเร็วสูง', 'ต้องการให้ระบบมีภาษาไทยที่อ่านง่ายและเข้าใจได้สำหรับทุกกลุ่มอายุ'] }
+                ]
+            },
+            part4: [
+                { id: 'suggest_1', label: '1. ท่านคิดว่าอุปสรรคที่ใหญ่ที่สุดในการนำระบบประเมินความพึงพอใจดิจิทัลมาใช้ใน รพ.สต. คืออะไร' },
+                { id: 'suggest_2', label: '2. ท่านต้องการให้ระบบประเมินความพึงพอใจใหม่มีฟังก์ชันพิเศษอะไรเพิ่มเติมนอกเหนือจากที่กล่าวมาข้างต้น' },
+                { id: 'suggest_3', label: '3. ท่านมีความเห็นอย่างไรต่อการนำปัญญาประดิษฐ์ (AI) มาช่วยวิเคราะห์ความพึงพอใจในการให้บริการสุขภาพปฐมภูมิ' },
+                { id: 'suggest_4', label: '4. ข้อเสนอแนะอื่น ๆ ที่ท่านต้องการให้ผู้วิจัยทราบ' }
+            ]
+        };
+
+        // --- DOM เรนเดอร์ส่วนต่างๆ ---
+        function renderForm(containerPrefix = '', targetForm = document) {
+            // Part 1
+            const p1Container = targetForm.getElementById(containerPrefix ? `${containerPrefix}-part1-container` : 'part1-container');
+            if(p1Container) p1Container.innerHTML = questionnaireConfig.part1.map(q => `
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="font-semibold text-gray-800 mb-3">${q.label}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 radio-btn-group">
+                        ${q.options.map(opt => `
+                            <label class="cursor-pointer block h-full">
+                                <input type="radio" name="${q.id}" value="${opt}" class="peer sr-only">
+                                <div class="h-full flex items-center justify-center p-3 bg-white border border-gray-300 rounded-lg text-sm text-center text-gray-700 hover:bg-gray-100 transition duration-150">${opt}</div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Helper for Likert rendering
+            const renderLikertSections = (config, prefixName, containerId) => {
+                const container = targetForm.getElementById(containerPrefix ? `${containerPrefix}-${containerId}` : containerId);
+                if(!container) return;
+                container.innerHTML = config.sections.map(sec => `
+                    <div class="mb-6">
+                        <h4 class="font-bold text-gray-700 bg-gray-100 p-2 rounded-t-lg border border-gray-200">${sec.title}</h4>
+                        <div class="border border-t-0 border-gray-200 rounded-b-lg overflow-hidden">
+                            ${sec.texts.map((text, idx) => {
+                                const qId = `${prefixName}_${sec.start + idx}`;
+                                return `
+                                <div class="p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 scale-group">
+                                    <div class="md:w-3/5">
+                                        <span class="font-medium text-gray-800 mr-2">${sec.start + idx}.</span> 
+                                        <span class="text-sm text-gray-600">${text}</span>
+                                    </div>
+                                    <div class="md:w-2/5 flex justify-between gap-1 sm:gap-2">
+                                        ${[5, 4, 3, 2, 1].map(val => `
+                                            <label class="cursor-pointer flex-1 text-center" title="${val} คะแนน">
+                                                <input type="radio" name="${qId}" value="${val}" class="peer sr-only">
+                                                <div class="py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-100 transition">${val}</div>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            renderLikertSections(questionnaireConfig.part2, 'prob', 'part2-container');
+            renderLikertSections(questionnaireConfig.part3, 'need', 'part3-container');
+
+            // Part 4
+            const p4Container = targetForm.getElementById(containerPrefix ? `${containerPrefix}-part4-container` : 'part4-container');
+            if(p4Container) p4Container.innerHTML = questionnaireConfig.part4.map(q => `
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-2">${q.label}</label>
+                    <textarea name="${q.id}" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 shadow-sm" placeholder="พิมพ์คำตอบที่นี่..."></textarea>
+                </div>
+            `).join('');
+        }
+
+        // --- ระบบดึงข้อมูลจาก Google Apps Script ---
+        function loadDataFromGAS(callback) {
+            if (!SCRIPT_URL) {
+                console.warn("ระบบทำงานอยู่ แต่ยังไม่ได้ระบุ SCRIPT_URL");
+                if (callback) callback();
+                return;
+            }
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if(Array.isArray(data)) {
+                        localData = data;
+                        if(callback) callback();
+                    }
+                })
+                .catch(e => console.error('Error fetching data from GAS:', e));
+        }
+
+        // Initialize original form
+        document.addEventListener('DOMContentLoaded', () => {
+            renderForm();
+            // Clone form structure for edit modal
+            const editContainer = document.getElementById('edit-form-container');
+            editContainer.innerHTML = document.getElementById('researchForm').innerHTML;
+            // Remove submit button from cloned form
+            const submitBtnDiv = editContainer.querySelector('.text-center.pb-10');
+            if(submitBtnDiv) submitBtnDiv.remove();
+
+            // โหลดข้อมูลจาก GS ทันทีเมื่อเปิดหน้าเว็บ
+            loadDataFromGAS();
+        });
+
+        // --- ระบบส่งข้อมูล ---
+        document.getElementById('researchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!SCRIPT_URL) {
+                showMsg('แจ้งเตือน', 'กรุณาระบุ SCRIPT_URL ในโค้ดเพื่อบันทึกข้อมูลลงฐานข้อมูลจริง', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit');
+            const loader = document.getElementById('submit-loading');
+            btn.classList.add('hidden');
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            const formData = new FormData(this);
+
+            // Send to Google Apps Script เสมอ (ไม่มี Local mode)
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 'success' || data.id) {
+                        showMsg('สำเร็จ!', 'บันทึกข้อมูลลงฐานข้อมูล Google Sheets เรียบร้อยแล้ว', 'success');
+                        this.reset();
+                        document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+                        // โหลดข้อมูลมาเตรียมไว้เบื้องหลัง
+                        loadDataFromGAS();
+                    } else {
+                        showMsg('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้: ' + (data.error || ''), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    showMsg('ข้อผิดพลาด', 'ระบบขัดข้อง ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+                })
+                .finally(() => {
+                    btn.classList.remove('hidden');
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                });
+        });
+
+        // --- ระบบ UI / Navigation ---
+        function switchView(view) {
+            if(view === 'admin' && !currentAdminLoggedIn) {
+                openLoginModal();
+                return;
+            }
+
+            document.getElementById('view-form').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+
+            // Reset Nav styling
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-900'));
+            if(view !== 'admin') document.getElementById(`nav-${view}`).classList.add('bg-blue-900');
+
+            // ดึงข้อมูลล่าสุดจาก GS ทุกครั้งที่สลับไปหน้า Dashboard หรือ Admin
+            if(view === 'dashboard') {
+                loadDataFromGAS(() => renderDashboard());
+            }
+            if(view === 'admin') {
+                loadDataFromGAS(() => renderAdminTable());
+            }
+        }
+
+        function refreshDashboard() {
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลด...';
+            btn.disabled = true;
+            
+            loadDataFromGAS(() => {
+                renderDashboard();
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                showMsg('อัปเดตข้อมูล', 'ดึงข้อมูลล่าสุดจาก Google Sheets เรียบร้อยแล้ว', 'success');
+            });
+        }
+
+        // --- ระบบ Dashboard และคำนวณสถิติ ---
+        function calculateStats(keyPrefix, count) {
+            let sums = Array(count).fill(0);
+            let validCounts = Array(count).fill(0);
+            let valuesArray = Array.from({length: count}, () => []);
+
+            localData.forEach(row => {
+                for(let i=1; i<=count; i++) {
+                    const val = parseInt(row[`${keyPrefix}_${i}`]);
+                    if(!isNaN(val)) {
+                        sums[i-1] += val;
+                        validCounts[i-1]++;
+                        valuesArray[i-1].push(val);
+                    }
+                }
+            });
+
+            return sums.map((sum, idx) => {
+                const n = validCounts[idx];
+                if(n === 0) return { mean: 0, sd: 0 };
+                const mean = sum / n;
+                const variance = valuesArray[idx].reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
+                return { mean: mean, sd: Math.sqrt(variance) };
+            });
+        }
+
+        function getLevel(mean, type) {
+            if(mean === 0) return '-';
+            if(mean >= 4.50) return type === 'prob' ? 'ปัญหามากที่สุด' : 'ต้องการมากที่สุด';
+            if(mean >= 3.50) return type === 'prob' ? 'ปัญหามาก' : 'ต้องการมาก';
+            if(mean >= 2.50) return 'ปานกลาง';
+            if(mean >= 1.50) return type === 'prob' ? 'ปัญหาน้อย' : 'ต้องการน้อย';
+            return type === 'prob' ? 'ปัญหาน้อยที่สุด' : 'ต้องการน้อยที่สุด';
+        }
+
+        function renderDashboard() {
+            document.getElementById('dash-total').innerText = localData.length;
+
+            if(localData.length === 0) return;
+
+            // Calc Part 2 & 3
+            const probStats = calculateStats('prob', 20);
+            const needStats = calculateStats('need', 25);
+
+            // Overall Averages
+            const calcOverallMean = (stats) => {
+                let validStats = stats.filter(s => s.mean > 0);
+                if(validStats.length === 0) return 0;
+                return validStats.reduce((acc, curr) => acc + curr.mean, 0) / validStats.length;
+            };
+
+            const probOverall = calcOverallMean(probStats);
+            const needOverall = calcOverallMean(needStats);
+
+            document.getElementById('dash-prob-avg').innerText = probOverall.toFixed(2);
+            document.getElementById('dash-prob-level').innerText = getLevel(probOverall, 'prob');
+            
+            document.getElementById('dash-need-avg').innerText = needOverall.toFixed(2);
+            document.getElementById('dash-need-level').innerText = getLevel(needOverall, 'need');
+
+            // Render Tables
+            const renderTable = (tbodyId, stats, configSections, prefix) => {
+                const tbody = document.getElementById(tbodyId);
+                let html = '';
+                configSections.forEach(sec => {
+                    html += `<tr class="bg-gray-100"><td colspan="4" class="px-3 py-2 font-bold text-gray-700">${sec.title}</td></tr>`;
+                    sec.texts.forEach((text, idx) => {
+                        const s = stats[sec.start + idx - 1];
+                        const level = getLevel(s.mean, prefix);
+                        const levelColor = s.mean >= 3.5 ? (prefix==='prob'?'text-red-600':'text-green-600') : 'text-gray-600';
+                        html += `
+                        <tr>
+                            <td class="px-3 py-2 text-gray-800"><span class="font-medium mr-1">${sec.start+idx}.</span>${text}</td>
+                            <td class="px-3 py-2 text-right font-medium text-blue-600">${s.mean.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-right text-gray-500">${s.sd.toFixed(2)}</td>
+                            <td class="px-3 py-2 text-center text-xs font-semibold ${levelColor} bg-gray-50">${level}</td>
+                        </tr>`;
+                    });
+                });
+                tbody.innerHTML = html;
+            };
+
+            renderTable('table-dash-prob', probStats, questionnaireConfig.part2.sections, 'prob');
+            renderTable('table-dash-need', needStats, questionnaireConfig.part3.sections, 'need');
+
+            // Render Demographics (Frequencies)
+            const countFreq = (key) => {
+                let counts = {};
+                localData.forEach(row => {
+                    const val = row[key] || 'ไม่ระบุ/เว้นว่าง';
+                    counts[val] = (counts[val] || 0) + 1;
+                });
+                return counts;
+            };
+
+            let demoHtml = '';
+            questionnaireConfig.part1.forEach(q => {
+                const freqs = countFreq(q.id);
+                demoHtml += `
+                <div class="bg-white border rounded-lg p-4 shadow-sm">
+                    <h5 class="font-bold text-sm text-gray-700 border-b pb-2 mb-2">${q.label}</h5>
+                    <ul class="text-sm space-y-1">
+                        ${q.options.map(opt => {
+                            const count = freqs[opt] || 0;
+                            const pct = localData.length > 0 ? ((count/localData.length)*100).toFixed(1) : 0;
+                            return `
+                            <li class="flex justify-between items-center">
+                                <span class="text-gray-600 truncate mr-2" title="${opt}">${opt}</span>
+                                <span class="font-semibold bg-gray-100 px-2 py-1 rounded text-xs whitespace-nowrap">${count} คน (${pct}%)</span>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                </div>`;
+            });
+            document.getElementById('chart-demographics').innerHTML = demoHtml;
+        }
+
+        function switchDashTab(tabId) {
+            document.querySelectorAll('.dash-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab styles
+            const tabs = ['dash-p1', 'dash-p2', 'dash-p3'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                if(t === tabId) {
+                    btn.classList.add('border-blue-500', 'text-blue-600');
+                    btn.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    btn.classList.remove('border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+        }
+
+        // --- ระบบ Admin ---
+        function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+        function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); document.getElementById('login-error').classList.add('hidden'); }
+        
+        function checkLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            if(u === 'admin' && p === '1234') {
+                currentAdminLoggedIn = true;
+                closeLoginModal();
+                switchView('admin');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            currentAdminLoggedIn = false;
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+            switchView('form');
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '';
+            
+            if(localData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">ยังไม่มีข้อมูลในระบบ</td></tr>';
+                return;
+            }
+
+            localData.forEach((row, index) => {
+                // Check missing
+                let missingP1 = 0; let totalP1 = 7;
+                questionnaireConfig.part1.forEach(q => { if(!row[q.id]) missingP1++; });
+                
+                let missingP23 = 0; let totalP23 = 45; // 20 + 25
+                for(let i=1; i<=20; i++) if(!row[`prob_${i}`]) missingP23++;
+                for(let i=1; i<=25; i++) if(!row[`need_${i}`]) missingP23++;
+
+                const p1Color = missingP1 > 0 ? 'text-red-600 font-bold' : 'text-green-600';
+                const p23Color = missingP23 > 0 ? 'text-red-600 font-bold' : 'text-green-600';
+
+                tbody.innerHTML += `
+                <tr class="hover:bg-blue-50 transition cursor-pointer" onclick="openEditModal(${index})">
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium">#${index+1} <br><span class="text-xs text-gray-400">${row.id || 'N/A'}</span></td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.status || '-'}</td>
+                    <td class="px-4 py-3 text-center text-sm ${p1Color}">${totalP1 - missingP1}/${totalP1}</td>
+                    <td class="px-4 py-3 text-center text-sm ${p23Color}">${totalP23 - missingP23}/${totalP23}</td>
+                    <td class="px-4 py-3 text-center text-sm">
+                        <button class="text-blue-600 hover:text-blue-900 font-semibold bg-blue-100 px-2 py-1 rounded">ตรวจสอบ</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        let editingIndex = -1;
+        function openEditModal(index) {
+            editingIndex = index;
+            const data = localData[index];
+            const form = document.getElementById('editForm');
+            
+            // Reset highlighting
+            form.querySelectorAll('input[type="radio"]').forEach(el => el.classList.remove('missing'));
+            form.querySelectorAll('textarea').forEach(el => el.classList.remove('border-red-500'));
+
+            document.getElementById('edit-id-display').innerText = data.id || `Row ${index+1}`;
+            document.getElementById('edit-id-input').value = data.id || '';
+
+            // Fill Data & Highlight Missing
+            const allInputs = form.querySelectorAll('input, textarea, select');
+            
+            // Check missing for Part 1, 2, 3
+            const requiredNames = [];
+            questionnaireConfig.part1.forEach(q => requiredNames.push(q.id));
+            for(let i=1; i<=20; i++) requiredNames.push(`prob_${i}`);
+            for(let i=1; i<=25; i++) requiredNames.push(`need_${i}`);
+
+            // Pre-fill and check
+            requiredNames.forEach(name => {
+                const val = data[name];
+                if(val) {
+                    const radio = form.querySelector(`input[name="${name}"][value="${val}"]`);
+                    if(radio) radio.checked = true;
+                } else {
+                    // Mark missing
+                    form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.classList.add('missing'));
+                }
+            });
+
+            // Part 4 (Textareas)
+            questionnaireConfig.part4.forEach(q => {
+                const el = form.querySelector(`textarea[name="${q.id}"]`);
+                if(el) el.value = data[q.id] || '';
+            });
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+        }
+
+        function submitEditForm() {
+            if(editingIndex === -1) return;
+            if (!SCRIPT_URL) {
+                showMsg('แจ้งเตือน', 'กรุณาระบุ SCRIPT_URL ก่อนทำการแก้ไขข้อมูล', 'error');
+                return;
+            }
+
+            const form = document.getElementById('editForm');
+            const formData = new FormData(form);
+            const updatedData = Object.fromEntries(formData.entries());
+            
+            // Preserve ID if it wasn't in form
+            updatedData.id = localData[editingIndex].id;
+
+            const btn = document.getElementById('btn-edit-submit');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังบันทึก...';
+            btn.disabled = true;
+
+            // Sent Update to GAS เท่านั้น (ไม่มี Local mode)
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    // โหลดข้อมูลทั้งหมดจาก GS ใหม่หลังจากอัปเดตสำเร็จ
+                    loadDataFromGAS(() => {
+                        renderAdminTable();
+                        closeEditModal();
+                        showMsg('สำเร็จ', 'อัปเดตข้อมูลลง Google Sheets เรียบร้อยแล้ว', 'success');
+                    });
+                } else {
+                    showMsg('ข้อผิดพลาด', 'ไม่สามารถบันทึกการแก้ไขได้', 'error');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                showMsg('ข้อผิดพลาด', 'ระบบขัดข้อง ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+            })
+            .finally(() => {
+                btn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> บันทึกการแก้ไข';
+                btn.disabled = false;
+            });
+        }
+
+        // --- Utils: Message Box ---
+        function showMsg(title, text, type) {
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-text').innerText = text;
+            const icon = document.getElementById('msg-icon');
+            if(type === 'success') {
+                icon.innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i>';
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500"></i>';
+            }
+            document.getElementById('msg-modal').classList.remove('hidden');
+        }
+        function closeMsgModal() {
+            document.getElementById('msg-modal').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
