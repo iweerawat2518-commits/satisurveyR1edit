@@ -286,12 +286,25 @@
         </div>
     </div>
 
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full text-center shadow-xl">
+            <div class="text-4xl mb-4 text-red-500"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="text-lg font-bold mb-2">ยืนยันการลบข้อมูล</h3>
+            <p class="text-gray-600 mb-6">คุณแน่ใจหรือไม่ที่จะลบข้อมูลชุดนี้? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+            <div class="flex justify-center space-x-3">
+                <button onclick="closeConfirmDelete()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">ยกเลิก</button>
+                <button onclick="executeDelete()" id="btn-confirm-delete" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">ลบข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ---------------------------------------------------- -->
     <!-- JAVASCRIPT LOGIC -->
     <!-- ---------------------------------------------------- -->
     <script>
         // === การตั้งค่าเชื่อมต่อ Google Apps Script (นำ URL จาก Deploy มาใส่ตรงนี้) ===
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4TqIMJv3L3F4HgOnZMhMFioYOunvC7qMQw1GTmtqINSFOEdfr_bixjotQgxVyizB1/exec'; // จำเป็นต้องระบุ URL นี้เพื่อให้บันทึกและดึงข้อมูลจาก GS ได้จริง
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUiI5Dm8K9rEUxfo55NjUQ-pqHmja-Npe1PCShocykuRjOwlNa_nQ9bo1UVRL6U8oj/exec'; // จำเป็นต้องระบุ URL นี้เพื่อให้บันทึกและดึงข้อมูลจาก GS ได้จริง
         
         // สถานะและข้อมูล
         let localData = []; 
@@ -407,10 +420,17 @@
                 .then(data => {
                     if(Array.isArray(data)) {
                         localData = data;
-                        if(callback) callback();
+                    } else {
+                        console.error('GAS Error or Invalid Data:', data);
                     }
+                    // ทำงาน callback เสมอเพื่อป้องกันหน้าจอระบบค้าง หากข้อมูลผิดพลาด
+                    if(callback) callback();
                 })
-                .catch(e => console.error('Error fetching data from GAS:', e));
+                .catch(e => {
+                    console.error('Error fetching data from GAS:', e);
+                    // ทำงาน callback เสมอแม้เกิด error เพื่อให้ UI ปิดโหลดต่อไปได้
+                    if(callback) callback();
+                });
         }
 
         // Initialize original form
@@ -425,6 +445,14 @@
 
             // โหลดข้อมูลจาก GS ทันทีเมื่อเปิดหน้าเว็บ
             loadDataFromGAS();
+
+            // เพิ่ม Event Listener เพื่อลบกรอบสีแดง (Missing) ทันทีที่ผู้ใช้คลิกแก้ไขข้อมูล ไม่ให้จอค้างสเตตัสเดิม
+            document.getElementById('editForm').addEventListener('change', function(e) {
+                if(e.target.tagName === 'INPUT' && e.target.type === 'radio') {
+                    const radios = this.querySelectorAll(`input[name="${e.target.name}"]`);
+                    radios.forEach(r => r.classList.remove('missing'));
+                }
+            });
         });
 
         // --- ระบบส่งข้อมูล ---
@@ -433,6 +461,29 @@
             
             if (!SCRIPT_URL) {
                 showMsg('แจ้งเตือน', 'กรุณาระบุ SCRIPT_URL ในโค้ดเพื่อบันทึกข้อมูลลงฐานข้อมูลจริง', 'error');
+                return;
+            }
+
+            // ตรวจสอบการกรอกข้อมูลให้ครบทุกช่อง (ส่วนที่ 1 ถึง 3)
+            let isFormComplete = true;
+            const requiredFields = [];
+            
+            // ดึงรายชื่อตัวแปรที่บังคับกรอก
+            questionnaireConfig.part1.forEach(q => requiredFields.push(q.id));
+            for(let i=1; i<=20; i++) requiredFields.push(`prob_${i}`);
+            for(let i=1; i<=25; i++) requiredFields.push(`need_${i}`);
+
+            const checkFormData = new FormData(this);
+            for (const field of requiredFields) {
+                if (!checkFormData.get(field)) {
+                    isFormComplete = false;
+                    break;
+                }
+            }
+
+            // แสดงข้อความแจ้งเตือนหากข้อมูลไม่ครบ
+            if (!isFormComplete) {
+                showMsg('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลให้ครบทุกช่องที่มีเครื่องหมาย * ก่อนบันทึกข้อมูล', 'error');
                 return;
             }
 
@@ -694,8 +745,9 @@
                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.status || '-'}</td>
                     <td class="px-4 py-3 text-center text-sm ${p1Color}">${totalP1 - missingP1}/${totalP1}</td>
                     <td class="px-4 py-3 text-center text-sm ${p23Color}">${totalP23 - missingP23}/${totalP23}</td>
-                    <td class="px-4 py-3 text-center text-sm">
-                        <button class="text-blue-600 hover:text-blue-900 font-semibold bg-blue-100 px-2 py-1 rounded">ตรวจสอบ</button>
+                    <td class="px-4 py-3 text-center text-sm whitespace-nowrap">
+                        <button onclick="event.stopPropagation(); openEditModal(${index})" class="text-blue-600 hover:text-blue-900 font-semibold bg-blue-100 px-2 py-1 rounded mr-1"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                        <button onclick="event.stopPropagation(); confirmDelete('${row.id}')" class="text-red-600 hover:text-red-900 font-semibold bg-red-100 px-2 py-1 rounded"><i class="fa-solid fa-trash"></i> ลบ</button>
                     </td>
                 </tr>`;
             });
@@ -756,40 +808,40 @@
                 return;
             }
 
-            const form = document.getElementById('editForm');
-            const formData = new FormData(form);
-            const updatedData = Object.fromEntries(formData.entries());
-            
-            // Preserve ID if it wasn't in form
-            updatedData.id = localData[editingIndex].id;
+            try {
+                const form = document.getElementById('editForm');
+                const formData = new FormData(form);
+                const updatedData = Object.fromEntries(formData.entries());
+                
+                // Preserve ID if it wasn't in form
+                updatedData.id = localData[editingIndex].id;
 
-            const btn = document.getElementById('btn-edit-submit');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังบันทึก...';
-            btn.disabled = true;
+                // 1. ทำการอัปเดตข้อมูลบนตารางและปิดหน้าต่างทันที (Optimistic Update) เพื่อไม่ให้ระบบสะดุดหรือค้าง
+                localData[editingIndex] = { ...localData[editingIndex], ...updatedData };
+                renderAdminTable();
+                closeEditModal();
+                
+                // แสดงป๊อปอัพสำเร็จให้ผู้ใช้ทราบทันที
+                showMsg('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
 
-            // Sent Update to GAS เท่านั้น (ไม่มี Local mode)
-            fetch(SCRIPT_URL, { method: 'POST', body: formData })
-            .then(res => res.json())
-            .then(data => {
-                if(data.result === 'success') {
-                    // โหลดข้อมูลทั้งหมดจาก GS ใหม่หลังจากอัปเดตสำเร็จ
-                    loadDataFromGAS(() => {
-                        renderAdminTable();
-                        closeEditModal();
-                        showMsg('สำเร็จ', 'อัปเดตข้อมูลลง Google Sheets เรียบร้อยแล้ว', 'success');
-                    });
-                } else {
-                    showMsg('ข้อผิดพลาด', 'ไม่สามารถบันทึกการแก้ไขได้', 'error');
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                showMsg('ข้อผิดพลาด', 'ระบบขัดข้อง ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
-            })
-            .finally(() => {
-                btn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> บันทึกการแก้ไข';
-                btn.disabled = false;
-            });
+                // 2. ส่งข้อมูลไปทำงานเบื้องหลัง (Background Task) โดยไม่กวนหน้าจอผู้ใช้
+                fetch(SCRIPT_URL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.result === 'success') {
+                        // Sync ข้อมูลให้ตรงกันเบื้องหลังเงียบๆ
+                        loadDataFromGAS();
+                    } else {
+                        console.error('Save Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Connection Error:', error);
+                });
+            } catch (err) {
+                console.error('Update Error:', err);
+                showMsg('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่', 'error');
+            }
         }
 
         // --- Utils: Message Box ---
@@ -806,6 +858,62 @@
         }
         function closeMsgModal() {
             document.getElementById('msg-modal').classList.add('hidden');
+        }
+
+        // --- ระบบลบข้อมูล ---
+        let deleteTargetId = null;
+
+        function confirmDelete(id) {
+            deleteTargetId = id;
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmDelete() {
+            document.getElementById('confirm-delete-modal').classList.add('hidden');
+            deleteTargetId = null;
+        }
+
+        function executeDelete() {
+            if (!SCRIPT_URL) {
+                showMsg('แจ้งเตือน', 'กรุณาระบุ SCRIPT_URL ก่อนทำการลบข้อมูล', 'error');
+                closeConfirmDelete();
+                return;
+            }
+
+            const btn = document.getElementById('btn-confirm-delete');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังลบ...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('ID', deleteTargetId);
+
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    showMsg('สำเร็จ', 'ลบข้อมูลออกจากระบบเรียบร้อยแล้ว', 'success');
+                    
+                    // ลบข้อมูลบนหน้าจอทันที เพื่อไม่ให้จอค้าง
+                    localData = localData.filter(row => row.id !== deleteTargetId);
+                    renderAdminTable();
+                    
+                    // โหลดอัปเดตเบื้องหลัง
+                    loadDataFromGAS();
+                } else {
+                    showMsg('ข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้', 'error');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                showMsg('ข้อผิดพลาด', 'ระบบขัดข้อง ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                closeConfirmDelete();
+            });
         }
 
     </script>
